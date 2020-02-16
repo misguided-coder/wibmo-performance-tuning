@@ -1,0 +1,82 @@
+Garbage collector was designed based on the following two assumptions. 
+
+Most objects soon become unreachable.
+References from old objects to young objects only exist in small numbers.
+
+
+GC Types 
+
+Serial GC (-XX:+UseSerialGC)
+Parallel GC   (-XX:+UseParallelGC) - Throughput GC
+Parallel Old GC (Parallel Compacting GC) (-XX:+UseParallelOldGC)
+Concurrent Mark & Sweep GC  (or "CMS") (-XX:+UseConcMarkSweepGC) -  Low latency GC
+Garbage First (G1) GC
+
+jstat  -gc  pid  time 
+jstat –gc <vmid> time (ms/s) 10 (repeat)
+
+
+gc
+It shows the current size for each heap area and its current usage (Ede, survivor, old, etc.), total number of GC performed, and the accumulated time for GC operations.
+
+gccapactiy	
+It shows the minimum size (ms) and maximum size (mx) of each heap area, current size, and the number of GC performed for each area. (Does not show current usage and
+accumulated time for GC operations.)
+
+gccause	
+It shows the "information provided by -gcutil" + reason for the last GC and the reason for the current GC.
+
+gcnew	
+Shows the GC performance data for the new area.
+
+gcnewcapacity	
+Shows statistics for the size of new area.
+
+gcold	
+Shows the GC performance data for the old area.
+
+gcoldcapacity	
+Shows statistics for the size of old area.
+
+gcutil	
+Shows the usage for each heap area in percentage. Also shows the total number of GC performed and the accumulated time for GC operations.
+
+
+The followings are other options that can be used with -verbosegc.
+
+-XX:+PrintGCDetails -XX:+PrintGCTimeStamps -XX:+PrintHeapAtGC -XX:+PrintGCDateStamps -Xloggc:gc-logs.txt
+
+When using -verbosegc, you can see the results in the following format whenever a minor GC occurs.
+
+[GC [<collector>: <starting occupancy1> -> <ending occupancy1>, <pause time1> secs] <starting occupancy3> -> <ending occupancy3>, <pause time3> secs]
+
+Collector	Name of Collector Used for minor gc
+starting occupancy1	The size of young area before GC
+ending occupancy1	The size of young area after GC
+pause time1	The time when the Java application stopped running for minor GC
+starting occupancy3	The total size of heap area before GC
+ending occupancy3	The total size of heap area after GC
+pause time3	The time when the Java application stopped running for overall heap GC, including major GC
+
+
+-XX:ParallelGCThreads=value
+-XX:+UseParNewGC
+-XX:+CMSParallelRemarkEnabled
+
+-XX:NewRatio
+-XX:NewSize
+-XX:SurvivorRatio
+
+There is no GC overhead if below conditions meet -----
+
+Minor GC is processed quickly (within 50 ms).
+Minor GC is not frequently executed (about 10 seconds).
+Full GC is processed quickly (within 1 second).
+Full GC is not frequently executed (once per 10 minutes).
+
+For getting heap dump, following are few options -----
+
+java -XX:+HeapDumpOnOutOfMemoryError -XX:HeapDumpPath=C:/heap-logs/heap-crash.dump.txt -XX:+UseParNewGC  -XX:+UseConcMarkSweepGC -XX:ParallelGCThreads=4 -Xms1G -Xmx1G -XX:NewRatio=3 -XX:SurvivorRatio=10 -XX:MaxTenuringThreshold=4  OOMemoryTest
+                                                        
+jmap -dump:live,format=b,file=heap-dump.bin <pid>
+

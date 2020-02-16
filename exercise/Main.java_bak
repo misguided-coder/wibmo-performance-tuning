@@ -1,0 +1,111 @@
+public class Main implements Runnable {
+	
+	Thread threadA,threadB=null;
+	
+	public Main() {
+		
+		
+		threadA=new Thread(this,"Mathematcian");
+		threadB=new Thread(this,"HighShopper");
+
+		
+		try {
+			Thread.sleep(3000);
+		} catch (InterruptedException e) {
+			e.printStackTrace();
+		}
+		
+		threadA.start();
+
+		try {
+			Thread.sleep(2000);
+		} catch (InterruptedException e) {
+			e.printStackTrace();
+		}
+
+		threadB.start();
+
+		try {
+			threadA.join();
+			threadB.join();
+		} catch (InterruptedException e1) {
+			e1.printStackTrace();
+		}
+
+	}
+	
+	@Override
+	public void run() {
+		
+		if(Thread.currentThread() == threadA){
+			for(int i=0;i<500;i++){
+				
+				CalculatorService calculatorService = new CalculatorService();
+
+				calculatorService.doSum(10,3);
+				calculatorService.doDiff(10,3);
+				try {
+					Thread.sleep(200);
+				} catch (InterruptedException e) {
+					e.printStackTrace();
+				}
+			}
+		}
+		if(Thread.currentThread() == threadB){
+
+			for(int i=0;i<500;i++){
+				
+				ShoppingCartService shoppingCartService = new ShoppingCartService();
+				OrderService orderService = new OrderService();
+			
+				Product p1=new Product(100,"Nano", 1000000.00,1);
+				Product p2=new Product(101,"Audi", 1450000.00,1);
+				Product p3=new Product(102,"BMW", 7800000.00,1);
+				
+				shoppingCartService.addItem(p1);
+				shoppingCartService.addItem(p1);
+				shoppingCartService.addItem(p1);
+				shoppingCartService.addItem(p2);
+				shoppingCartService.addItem(p2);
+				shoppingCartService.addItem(p3);
+
+	
+				System.out.println(shoppingCartService.totalPrice());
+				
+				shoppingCartService.addItem(p2);
+				shoppingCartService.addItem(p3);
+	
+				System.out.println(shoppingCartService.totalPrice());
+	
+				try {
+					shoppingCartService.removeItem(102);
+					System.out.println(shoppingCartService.totalPrice());
+				} catch (ItemNotFoundException e) {
+					e.printStackTrace();
+				}
+				
+				
+				System.out.println(shoppingCartService.countItems());
+	
+				orderService.placeOrder("ritesh",shoppingCartService.showCartDetails());
+ 
+				shoppingCartService.emptyCart();
+				
+				System.out.println(shoppingCartService.countItems());
+
+				try {
+					Thread.sleep(100);
+				} catch (InterruptedException e) {
+					e.printStackTrace();
+				}
+
+			}
+
+		}
+	}
+	
+	public static void main(String[] args) {
+		new Main();
+	}
+
+}
